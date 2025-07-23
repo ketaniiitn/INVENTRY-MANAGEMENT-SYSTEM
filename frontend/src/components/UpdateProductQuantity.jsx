@@ -18,7 +18,7 @@ const UpdateProductQuantity = ({ onQuantityUpdated }) => {
   const fetchProducts = async () => {
     setFetchingProducts(true)
     try {
-      const data = await productAPI.getProducts(1, 100) // Get more products for selection
+      const data = await productAPI.getProducts(1, 100)
       setProducts(data)
     } catch (error) {
       toast.error("Failed to fetch products")
@@ -44,15 +44,10 @@ const UpdateProductQuantity = ({ onQuantityUpdated }) => {
     try {
       await productAPI.updateQuantity(selectedProduct, Number.parseInt(newQuantity))
       toast.success("Quantity updated successfully!")
-
-      // Reset form
       setSelectedProduct("")
       setNewQuantity("")
-
-      // Refresh products list
       await fetchProducts()
 
-      // Trigger refresh in parent component
       if (onQuantityUpdated) {
         onQuantityUpdated()
       }
@@ -66,125 +61,165 @@ const UpdateProductQuantity = ({ onQuantityUpdated }) => {
   const selectedProductData = products.find((p) => p.id === selectedProduct)
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Update Product Quantity</h2>
-
-      {fetchingProducts ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <div className="p-8 bg-[#0e101c] min-h-screen text-white">
+      <div className="max-w-6xl mx-auto bg-[#121624] rounded-2xl shadow-lg border border-gray-800 p-10">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold mb-2">Update Stock Quantity</h2>
+          <p className="text-gray-400">Adjust inventory levels for existing products</p>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="product" className="block text-sm font-medium text-gray-700 mb-2">
-              Select Product *
-            </label>
-            <select
-              id="product"
-              value={selectedProduct}
-              onChange={(e) => setSelectedProduct(e.target.value)}
-              className="input-field"
-              required
-            >
-              <option value="">Choose a product...</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name} - {product.sku} (Current: {product.quantity})
-                </option>
-              ))}
-            </select>
-          </div>
 
-          {selectedProductData && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Product Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        {fetchingProducts ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column */}
+              <div className="space-y-6">
                 <div>
-                  <span className="font-medium text-gray-700">Name:</span>
-                  <span className="ml-2 text-gray-900">{selectedProductData.name}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Type:</span>
-                  <span className="ml-2 text-gray-900">{selectedProductData.type}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">SKU:</span>
-                  <span className="ml-2 text-gray-900">{selectedProductData.sku}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Current Quantity:</span>
-                  <span
-                    className={`ml-2 font-medium ${
-                      selectedProductData.quantity > 10
-                        ? "text-green-600"
-                        : selectedProductData.quantity > 0
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                    }`}
+                  <label htmlFor="product" className="block text-sm font-semibold text-gray-300 mb-2">
+                    Select Product *
+                  </label>
+                  <select
+                    id="product"
+                    value={selectedProduct}
+                    onChange={(e) => setSelectedProduct(e.target.value)}
+                    className="bg-white text-black rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   >
-                    {selectedProductData.quantity}
-                  </span>
+                    <option value="">Choose a product to update...</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name} - {product.sku} (Current: {product.quantity})
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
                 <div>
-                  <span className="font-medium text-gray-700">Price:</span>
-                  <span className="ml-2 text-gray-900">${selectedProductData.price.toFixed(2)}</span>
+                  <label htmlFor="quantity" className="block text-sm font-semibold text-gray-300 mb-2">
+                    New Stock Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    id="quantity"
+                    min="0"
+                    className="bg-white text-black text-xl rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                    placeholder="Enter new quantity"
+                    value={newQuantity}
+                    onChange={(e) => setNewQuantity(e.target.value)}
+                    required
+                  />
                 </div>
               </div>
+
+              {/* Right Column */}
+              <div>
+                {selectedProductData ? (
+                  <div className="bg-gray-800/30 rounded-2xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold mb-6 flex items-center">
+                      <span className="mr-2">📋</span> Product Details
+                    </h3>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        {selectedProductData.image_url ? (
+                          <img
+                            className="h-20 w-20 rounded-xl object-cover border border-gray-600"
+                            src={selectedProductData.image_url}
+                            alt={selectedProductData.name}
+                            onError={(e) => (e.target.style.display = "none")}
+                          />
+                        ) : (
+                          <div className="h-20 w-20 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center border border-gray-600">
+                            <span className="text-gray-400 text-xl">📦</span>
+                          </div>
+                        )}
+
+                        <div>
+                          <h4 className="text-lg font-semibold">{selectedProductData.name}</h4>
+                          <p className="text-gray-400 text-sm">{selectedProductData.type}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="bg-gray-900/50 rounded-lg p-3">
+                          <span className="text-gray-400 block">SKU</span>
+                          <span className="text-white font-mono font-semibold">{selectedProductData.sku}</span>
+                        </div>
+                        <div className="bg-gray-900/50 rounded-lg p-3">
+                          <span className="text-gray-400 block">Price</span>
+                          <span className="text-white font-semibold">${selectedProductData.price.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-900/50 rounded-lg p-4">
+                        <span className="text-gray-400 block mb-2">Current Stock</span>
+                        <span
+                          className={`inline-flex px-4 py-2 text-lg font-bold rounded-lg ${
+                            selectedProductData.quantity > 10
+                              ? "bg-green-400/20 text-green-400 border border-green-400/30"
+                              : selectedProductData.quantity > 0
+                              ? "bg-yellow-400/20 text-yellow-400 border border-yellow-400/30"
+                              : "bg-red-400/20 text-red-400 border border-red-400/30"
+                          }`}
+                        >
+                          {selectedProductData.quantity} units
+                        </span>
+                      </div>
+
+                      {selectedProductData.description && (
+                        <div className="bg-gray-900/50 rounded-lg p-3">
+                          <span className="text-gray-400 block mb-1">Description</span>
+                          <p className="text-white text-sm">{selectedProductData.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gray-800/20 rounded-2xl p-8 border border-gray-700 border-dashed text-center">
+                    <div className="text-gray-500 text-6xl mb-4">📦</div>
+                    <p className="text-gray-400">Select a product to view details</p>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
 
-          <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
-              New Quantity *
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              min="0"
-              className="input-field"
-              placeholder="Enter new quantity"
-              value={newQuantity}
-              onChange={(e) => setNewQuantity(e.target.value)}
-              required
-            />
-          </div>
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedProduct("")
+                  setNewQuantity("")
+                }}
+                className="bg-gray-600 hover:bg-gray-700 transition text-white py-2 px-6 rounded-lg font-medium"
+              >
+                Clear Selection
+              </button>
 
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedProduct("")
-                setNewQuantity("")
-              }}
-              className="btn-secondary"
-            >
-              Clear Form
-            </button>
-            <button
-              type="submit"
-              disabled={loading || !selectedProduct}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Updating...
-                </div>
-              ) : (
-                "Update Quantity"
-              )}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {products.length === 0 && !fetchingProducts && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">📦</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-500">Add some products first to update their quantities.</p>
-        </div>
-      )}
+              <button
+                type="submit"
+                disabled={loading || !selectedProduct}
+                className="bg-blue-600 hover:bg-blue-700 transition text-white py-2 px-6 rounded-lg shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    Updating Stock...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <span className="mr-2">📝</span>
+                    Update Stock Quantity
+                  </div>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   )
 }

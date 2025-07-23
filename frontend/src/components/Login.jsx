@@ -15,7 +15,6 @@ const Login = () => {
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
-  // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated()) {
       navigate("/dashboard")
@@ -51,61 +50,95 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{" "}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              create a new account
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="username" className="sr-only">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : "Sign in"}
-            </button>
+      {/* ✅ Glowing Header INSIDE background and at top */}
+      <header className="absolute top-0 left-0 w-full bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 text-white z-50 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-cyan-400 after:shadow-[0_0_10px_#22d3ee]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <div className="h-10 w-10 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-xl flex items-center justify-center glow-teal">
+                <span className="text-lg font-bold text-gray-900">📦</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Inventory Pro</h1>
+                <p className="text-xs text-gray-400">Management System</p>
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
+      </header>
+
+      {/* Background blur elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-teal-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-400/5 rounded-full blur-3xl"></div>
+      </div>
+
+      {/* Login Form */}
+      <div className="max-w-md w-full space-y-8 relative z-10 pt-20">
+        <div className="text-center">
+          <h2 className="text-4xl font-bold text-white mb-2">Welcome back</h2>
+          <p className="text-gray-400 text-lg">Sign in to your inventory dashboard</p>
+        </div>
+
+        <div className="card-glow">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  className="input-field"
+                  placeholder="Enter your username"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="input-field"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading} className="btn-primary w-full text-lg">
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-2"></div>
+                  Signing in...
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+
+            <div className="text-center">
+              <p className="text-gray-400">
+                Don't have an account?{" "}
+                <Link to="/register" className="gradient-text font-semibold hover:underline">
+                  Create one here
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

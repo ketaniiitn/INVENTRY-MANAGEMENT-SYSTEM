@@ -1,0 +1,277 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+		"name": "Inventory Management API",
+		"description": "A collection for testing the Inventory Management System backend.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Register User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 (Created) or 409 (Conflict)\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"puja\",\n    \"password\": \"mypassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"register"
+					]
+				},
+				"description": "Creates a new user account. Running this multiple times is safe; it will return 409 if the user already exists."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Login User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    // Save the token to a collection variable to use in other requests",
+							"    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"puja\",\n    \"password\": \"mypassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				},
+				"description": "Authenticates the user and saves the JWT to a collection variable named `access_token`."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Add Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response has product_id\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.product_id).to.not.be.empty;",
+							"    // Save the product_id to a collection variable",
+							"    pm.collectionVariables.set(\"product_id\", jsonData.product_id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Laptop Pro\",\n    \"type\": \"Electronics\",\n    \"sku\": \"LPTP-002\",\n    \"image_url\": \"https://example.com/laptop.jpg\",\n    \"description\": \"A powerful new laptop for professionals.\",\n    \"quantity\": 25,\n    \"price\": 1499.99\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products"
+					]
+				},
+				"description": "Adds a new product to the inventory. It uses the `access_token` from the Login request for authorization."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get All Products",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/products?page=1&per_page=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "5"
+						}
+					]
+				},
+				"description": "Retrieves a paginated list of products from the inventory."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Update Product Quantity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains updated quantity\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.quantity).to.eql(50);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"quantity\": 50\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/products/{{product_id}}/quantity",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"{{product_id}}",
+						"quantity"
+					]
+				},
+				"description": "Updates the stock quantity for the product created in the 'Add Product' step."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string",
+			"description": "Holds the JWT retrieved from the login endpoint."
+		},
+		{
+			"key": "product_id",
+			"value": "",
+			"type": "string",
+			"description": "Holds the ID of the product created in the 'Add Product' request."
+		}
+	]
+}
