@@ -102,6 +102,20 @@ You can test the application in two ways:
     # In the backend folder (with venv activated)
     python test_api.py
     ````
+## 🔐 Login Page
+![Login](./frontend/src/assets/Login.png)
+
+## 📋 Dashboard View
+![Dashboard](./frontend/src/assets/Dashboard.png)
+
+## 👁️ Product View Modal
+![View](./frontend/src/assets/View.png)
+
+## ♻️ Update Stock Modal
+![Update Stock](./frontend/src/assets/UpdateStock.png)
+
+## 🔄 Route Check Example
+![Route Check](./frontend/src/assets/RouteCheck.png)
 
 ---
 
