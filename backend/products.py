@@ -8,6 +8,61 @@ product_bp = Blueprint('products', __name__)
 @product_bp.route('', methods=['POST'])
 @token_required
 def add_product(current_user):
+    """
+    Add a new product
+    ---
+    tags:
+      - Products
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - name
+            - type
+            - sku
+            - quantity
+            - price
+          properties:
+            name:
+              type: string
+              description: Name of the product.
+            type:
+              type: string
+              description: Type or category of the product.
+            sku:
+              type: string
+              description: Stock Keeping Unit.
+            image_url:
+              type: string
+              description: URL of the product image.
+            description:
+              type: string
+              description: Description of the product.
+            quantity:
+              type: integer
+              description: Available quantity of the product.
+            price:
+              type: number
+              format: float
+              description: Price of the product.
+    responses:
+      201:
+        description: Product added successfully!
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            product_id:
+              type: string
+      400:
+        description: Missing product data!
+    """
     db = current_app.db
     products_collection = db.products
 
@@ -35,6 +90,41 @@ def add_product(current_user):
 @product_bp.route('', methods=['GET'])
 @token_required
 def get_products(current_user):
+    """
+    Get a list of all products
+    ---
+    tags:
+      - Products
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: A list of products.
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              type:
+                type: string
+              sku:
+                type: string
+              image_url:
+                type: string
+              description:
+                type: string
+              quantity:
+                type: integer
+              price:
+                type: number
+                format: float
+      400:
+        description: Invalid page or per_page parameter.
+    """
     db = current_app.db
     products_collection = db.products
 
@@ -66,6 +156,49 @@ def get_products(current_user):
 @product_bp.route('/<id>/quantity', methods=['PUT'])
 @token_required
 def update_product_quantity(current_user, id):
+    """
+    Update the quantity of a product
+    ---
+    tags:
+      - Products
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        type: string
+        required: true
+        description: ID of the product to update.
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - quantity
+          properties:
+            quantity:
+              type: integer
+              description: The new quantity for the product.
+    responses:
+      200:
+        description: Quantity updated successfully.
+        schema:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            quantity:
+              type: integer
+            message:
+              type: string
+      400:
+        description: Invalid product ID format or quantity is required and must be an integer!
+      404:
+        description: Product not found!
+    """
     db = current_app.db
     products_collection = db.products
 

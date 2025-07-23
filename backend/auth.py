@@ -8,6 +8,35 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST', 'OPTIONS'])
 def register_user():
+    """
+    Register a new user
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - username
+            - password
+          properties:
+            username:
+              type: string
+              description: The user's username.
+            password:
+              type: string
+              description: The user's password.
+    responses:
+      201:
+        description: New user created!
+      400:
+        description: Username and password required!
+      409:
+        description: User already exists!
+    """
     if request.method == 'OPTIONS':
         return '', 204
     db = current_app.db
@@ -38,6 +67,39 @@ def register_user():
 
 @auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login():
+    """
+    Log in a user and generate an access token
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - username
+            - password
+          properties:
+            username:
+              type: string
+              description: The user's username.
+            password:
+              type: string
+              description: The user's password.
+    responses:
+      200:
+        description: Successfully logged in.
+        schema:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: JWT access token.
+      401:
+        description: Could not verify - login failed.
+    """
     if request.method == 'OPTIONS':
         return '', 204
     db = current_app.db
