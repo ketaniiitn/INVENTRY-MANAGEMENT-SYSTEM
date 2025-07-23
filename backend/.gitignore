@@ -1,0 +1,56 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+
+# macOS specific
+.DS_Store
+
+# dotenv files (sensitive keys)
+.env
+.env.*
+
+# VSCode & IDE configs
+.vscode/
+.idea/
+
+# Flask cache files
+instance/
+*.sqlite3
+
+# Logs
+*.log
+
+# Test coverage / reports
+htmlcov/
+coverage.*
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Pylint/mypy reports
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Mongo DB dump files (if any)
+dump/
