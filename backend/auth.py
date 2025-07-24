@@ -4,7 +4,7 @@ import jwt
 import datetime
 from bson import ObjectId
 from flasgger import swag_from
-
+from datetime import timezone, datetime, timedelta
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
@@ -112,7 +112,7 @@ def login():
     if check_password_hash(user['password'], auth['password']):
         token = jwt.encode({
             'public_id': user['public_id'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60)
+            'exp': datetime.now(timezone.utc) + timedelta(minutes=60)
         }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
         return jsonify({'access_token': token})

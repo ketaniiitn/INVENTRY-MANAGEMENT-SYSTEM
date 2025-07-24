@@ -21,28 +21,47 @@ product_bp = Blueprint('products', __name__)
                 'required': ['name', 'type', 'sku', 'quantity', 'price'],
                 'properties': {
                     'name': {'type': 'string', 'description': 'Name of the product.'},
-                    'type': {'type': 'string', 'description': 'Category or type of the product.'},
-                    'sku': {'type': 'string', 'description': 'Stock Keeping Unit (SKU).'},
+                    'type': {'type': 'string', 'description': 'Type or category of the product.'},
+                    'sku': {'type': 'string', 'description': 'Unique Stock Keeping Unit.'},
                     'image_url': {'type': 'string', 'description': 'URL for the product image.'},
-                    'description': {'type': 'string', 'description': 'A detailed description of the product.'},
-                    'quantity': {'type': 'integer', 'description': 'Available quantity in stock.'},
-                    'price': {'type': 'number', 'format': 'float', 'description': 'Price of the product.'}
+                    'description': {'type': 'string', 'description': 'Detailed description of the product.'},
+                    'quantity': {'type': 'integer', 'description': 'Available quantity of the product.'},
+                    'price': {'type': 'number', 'description': 'Price of the product.'}
                 }
             }
         }
     ],
     'responses': {
         '201': {'description': 'Product added successfully!'},
-        '400': {'description': 'Missing product data!'},
-        '401': {'description': 'Token is missing or invalid!'}
+        '400': {'description': 'Invalid or missing product data.'},
+        '401': {'description': 'Authorization token is missing or invalid.'},
+        '409': {'description': 'Product with this SKU already exists.'}
     }
 })
 def add_product(current_user):
     db = current_app.db
     data = request.get_json()
 
-    if not all(k in data for k in ['name', 'type', 'sku', 'quantity', 'price']):
+    # --- FIX: Expanded validation ---
+    required_fields = ['name', 'type', 'sku', 'quantity', 'price']
+    if not all(k in data for k in required_fields):
         return jsonify({'message': 'Missing product data!'}), 400
+
+    # Validate data values
+    if not data['name'] or not data['sku']:
+        return jsonify({'message': 'Name and SKU cannot be empty.'}), 400
+    
+    if not isinstance(data.get('quantity'), int) or data['quantity'] < 0:
+        return jsonify({'message': 'Quantity must be a non-negative integer.'}), 400
+
+    if not isinstance(data.get('price'), (int, float)) or data['price'] < 0:
+        return jsonify({'message': 'Price must be a non-negative number.'}), 400
+
+    # Check for duplicate SKU
+    if db.products.find_one({"sku": data['sku']}):
+        return jsonify({'message': f"Product with SKU '{data['sku']}' already exists."}), 409 # 409 Conflict
+
+    # --- End of FIX ---
 
     result = db.products.insert_one({
         "name": data["name"],
@@ -65,12 +84,42 @@ def add_product(current_user):
     'summary': 'Get a paginated list of all products',
     'security': [{'bearerAuth': []}],
     'parameters': [
-        {'name': 'page', 'in': 'query', 'type': 'integer', 'default': 1, 'description': 'Page number for pagination'},
-        {'name': 'per_page', 'in': 'query', 'type': 'integer', 'default': 10, 'description': 'Number of items per page'}
+        {
+            'name': 'page',
+            'in': 'query',
+            'type': 'integer',
+            'default': 1,
+            'description': 'The page number for pagination.'
+        },
+        {
+            'name': 'per_page',
+            'in': 'query',
+            'type': 'integer',
+            'default': 10,
+            'description': 'The number of products to return per page.'
+        }
     ],
     'responses': {
-        '200': {'description': 'A list of products'},
-        '401': {'description': 'Token is missing or invalid!'}
+        '200': {
+            'description': 'A paginated list of products.',
+            'schema': {
+                'type': 'array',
+                'items': {
+                    'properties': {
+                        'id': {'type': 'string'},
+                        'name': {'type': 'string'},
+                        'type': {'type': 'string'},
+                        'sku': {'type': 'string'},
+                        'image_url': {'type': 'string'},
+                        'description': {'type': 'string'},
+                        'quantity': {'type': 'integer'},
+                        'price': {'type': 'number'}
+                    }
+                }
+            }
+        },
+        '400': {'description': 'Invalid pagination parameters.'},
+        '401': {'description': 'Authorization token is missing or invalid.'}
     }
 })
 def get_products(current_user):
@@ -80,6 +129,11 @@ def get_products(current_user):
         per_page = int(request.args.get('per_page', 10))
     except ValueError:
         return jsonify({'message': 'Invalid page or per_page parameter.'}), 400
+
+    # --- FIX: Add check for non-positive page/per_page values ---
+    if page <= 0 or per_page <= 0:
+        return jsonify({'message': 'Page and per_page parameters must be positive integers.'}), 400
+    # --- End of FIX ---
 
     skip = (page - 1) * per_page
     products_cursor = db.products.find({}).skip(skip).limit(per_page)
@@ -101,13 +155,19 @@ def get_products(current_user):
     'summary': 'Update the quantity of a specific product',
     'security': [{'bearerAuth': []}],
     'parameters': [
-        {'name': 'id', 'in': 'path', 'type': 'string', 'required': True, 'description': 'The ID of the product to update'},
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'string',
+            'required': True,
+            'description': 'The MongoDB ObjectId of the product to update.'
+        },
         {
             'in': 'body',
             'name': 'body',
             'required': True,
             'schema': {
-                'id': 'QuantityUpdate',
+                'id': 'ProductQuantity',
                 'required': ['quantity'],
                 'properties': {
                     'quantity': {
@@ -119,10 +179,10 @@ def get_products(current_user):
         }
     ],
     'responses': {
-        '200': {'description': 'Quantity updated successfully'},
-        '400': {'description': 'Invalid product ID or quantity format'},
-        '401': {'description': 'Token is missing or invalid!'},
-        '404': {'description': 'Product not found!'}
+        '200': {'description': 'Product quantity updated successfully.'},
+        '400': {'description': 'Invalid product ID or quantity provided.'},
+        '401': {'description': 'Authorization token is missing or invalid.'},
+        '404': {'description': 'Product not found.'}
     }
 })
 def update_product_quantity(current_user, id):
@@ -133,8 +193,14 @@ def update_product_quantity(current_user, id):
         return jsonify({'message': 'Invalid product ID format!'}), 400
 
     data = request.get_json()
+
+    # --- FIX: Expanded validation for quantity ---
     if 'quantity' not in data or not isinstance(data['quantity'], int):
         return jsonify({'message': 'Quantity is required and must be an integer!'}), 400
+
+    if data['quantity'] < 0:
+        return jsonify({'message': 'Quantity cannot be negative.'}), 400
+    # --- End of FIX ---
 
     result = db.products.update_one(
         {'_id': product_id},
