@@ -13,7 +13,7 @@ This project is a full-stack inventory management application built with a Pytho
 
 ## Technology Stack
 
-- **Backend**: Python, Flask, PyJWT, Flask-Cors
+- **Backend**: Python, Flask, PyJWT, Flask-Cors,Pytests,requests
 - **Database**: MongoDB
 - **Frontend**: React, Vite, Tailwind CSS, Axios, react-hot-toast,Shadcn/ui.
 
@@ -35,11 +35,11 @@ Stores product inventory information.
 - `_id`: ObjectId (Primary Key)
 - `name`: String
 - `type`: String
-- `sku`: String
+- `sku`: String (Unique)
 - `description`: String
 - `image_url`: String
-- `quantity`: Integer
-- `price`: Float
+- `quantity`: Integer (Positive Value)
+- `price`: Float (Positive Value)
 - `added_by`: String (public_id of the user who added it)
 
 ---
@@ -92,16 +92,41 @@ npm run dev
 
 ---
 
-## How to Test
+## ✅ How to Test
 
 You can test the application in two ways:
 
-1.  **Manual Testing**: Open the frontend URL in your browser, register a new user, log in, and use the interface to add and manage products.
-2.  **Automated API Testing**: Use the provided Python script to test the backend endpoints directly.
-    ```bash
-    # In the backend folder (with venv activated)
-    python test_api.py
-    ````
+---
+
+### 🔹 1. Manual Testing
+
+Open the frontend in your browser:
+
+- Register a new user
+- Log in with the created account
+- Add, view, update products via the UI
+
+---
+
+### 🔹 2. Automated API Testing
+
+You can run backend tests directly using the following commands:
+
+#### ▶️ Run standalone Python test script:
+
+```bash
+# Inside the backend folder (with virtual environment activated)
+python test_api.py
+```
+#### ▶️ Run pytest-based unit tests:
+
+```bash
+# Test authentication endpoints
+pytest -v test_auth.py
+
+# Test product-related endpoints
+pytest -v test_products.py
+```
 ## 🔐 Login Page
 ![Login](./frontend/src/assets/Login.png)
 
