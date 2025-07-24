@@ -165,20 +165,17 @@ const ProductList = () => {
   // State for the modal
   const [selectedProduct, setSelectedProduct] = useState(null)
 
-  const fetchProducts = async () => {
-    // Keep loading true if it's the initial load, otherwise don't show full-page loader for refresh
-    if (!products.length) {
-      setLoading(true)
-    }
-    try {
-      const data = await productAPI.getProducts(currentPage, perPage)
-      setProducts(data)
-    } catch (error) {
-      toast.error(error.message || "Failed to fetch products")
-    } finally {
-      setLoading(false)
-    }
+const fetchProducts = async () => {
+  setLoading(true) // Always set loading to true when fetching starts
+  try {
+    const data = await productAPI.getProducts(currentPage, perPage)
+    setProducts(data)
+  } catch (error) {
+    toast.error(error.message || "Failed to fetch products")
+  } finally {
+    setLoading(false)
   }
+}
 
   useEffect(() => {
     fetchProducts()
