@@ -1,0 +1,17 @@
+# .dockerignore
+# Ignore directories and files that are not needed in the Docker image
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git/
+.gitignore
+.DS_Store
+*.log
+npm-debug.log
+test_api.py
+test_auth.py
+test_products.py

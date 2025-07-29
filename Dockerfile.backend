@@ -1,0 +1,31 @@
+FROM python:3.9-slim-buster
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file from the backend directory into the container's /app directory
+COPY backend/requirements.txt .
+
+# Install any needed packages specified in requirements.txt
+# --no-cache-dir: Prevents pip from storing downloaded packages in a cache directory, reducing image size.
+# -r: Install from the given requirements file.
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code from the backend directory into the container's /app directory
+# This copies app.py, auth.py, products.py, utils.py, etc., directly into /app.
+COPY backend .
+
+# Expose port 8080, as defined in app.py
+EXPOSE 8080
+
+# Define environment variables for the application.
+# IMPORTANT: For production, you should pass these securely (e.g., Docker secrets, Kubernetes secrets)
+# and not hardcode them in the Dockerfile. This is for demonstration.
+# You will need to set these when you run the container.
+# For example: docker run -p 8080:8080 -e SECRET_KEY='your_secret_key' -e MONGO_URI='your_mongo_uri' your-image-name
+ENV SECRET_KEY="Z9Xn7%p3k1!JtU$wMvR@bFgL@2Qs8YcA"
+ENV MONGO_URI="mongodb+srv://bt22eci015:c6lwE425MhSuJ3Ae@cluster0.gsirrpk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Run the application using the python command.
+# The app.py script will start the Flask development server on port 8080.
+CMD ["python", "app.py"]
