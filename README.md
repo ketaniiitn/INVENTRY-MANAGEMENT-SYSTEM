@@ -53,39 +53,78 @@ Stores product inventory information.
 
 ### 1. Backend Setup
 
+#### Clone the repository
 ```bash
-# Clone the repository
 git clone <your-github-repo-link>
 cd INVENTRY-MANAGEMENT-SYSTEM/backend
-
-# Create and activate a virtual environment
+```
+#### Create and activate a virtual environment
+```bash
 python3 -m venv venv
 source venv/bin/activate
-# On Windows: venv\Scripts\activate
+On Windows: venv\Scripts\activate
+```
+
 
 # Install dependencies
+```bash
 pip install -r requirements.txt
-
+```
 # IMPORTANT: Database Initialization
-# Connect to MongoDB 
-# > use inventory_db
+ Connect to MongoDB 
+ > use inventory_db
 
 
 # Run the backend server
+```bash
 python app.py
 ```
 > The backend server will be running on `http://localhost:8080`.
 
-### 2. Frontend Setup
+---
+
+
+# 2. Docker Setup (Containerized Deployment)
+
+#### 🔨 Build Docker Image
+
+Make sure you're in the **root directory** of the project:
 
 ```bash
-# Open a new terminal and navigate to the frontend folder
+docker build -f Dockerfile.backend -t inventory-management .
+-f Dockerfile.backend → custom Dockerfile name
+-t inventory-management → name/tag for your Docker image
+```
+
+▶️ Run Docker Container
+---
+Option 1: Use Default Environment Variables
+(Default values are defined inside Dockerfile.backend)
+```bash
+docker run -p 8080:8080 inventory-management
+```
+Option 2: Override Environment Variables at Runtime
+If you want to provide your own environment variables instead of the defaults:
+```bash
+docker run -p 8080:8080 \
+  -e SECRET_KEY="your_custom_secret_key" \
+  -e MONGO_URI="your_custom_mongo_uri" \
+  inventory-management
+```
+
+# 3. Frontend Setup
+
+
+### Open a new terminal and navigate to the frontend folder
+```bash
 cd ../frontend
-
-# Install dependencies
+```
+### Install dependencies
+```bash
 npm install
-
-# Run the frontend development server
+```
+### Run the frontend development server
+```bash
 npm run dev
 ```
 > The frontend will be running on `http://localhost:3000` (or another available port).
