@@ -17,7 +17,14 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 mongo_uri = os.getenv('MONGO_URI')
 
 # --- Enable CORS ---
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:3000", 
+            "https://taupe-dango-df2abe.netlify.app/"
+        ]
+    }
+}, supports_credentials=True)
 
 # --- Swagger Configuration ---
 swagger_template = {
