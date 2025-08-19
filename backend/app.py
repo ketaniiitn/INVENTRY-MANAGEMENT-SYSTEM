@@ -20,9 +20,11 @@ mongo_uri = os.getenv('MONGO_URI')
 CORS(app, resources={
     r"/*": {
         "origins": [
-            "http://localhost:3000", 
-            "https://taupe-dango-df2abe.netlify.app/"
-        ]
+            "http://localhost:3000",
+            "https://taupe-dango-df2abe.netlify.app"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
     }
 }, supports_credentials=True)
 
