@@ -21,7 +21,7 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:3000",
-            "https://taupe-dango-df2abe.netlify.app"
+            "https://scintillating-fairy-1ea183.netlify.app"
         ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
